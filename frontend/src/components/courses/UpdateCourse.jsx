@@ -92,7 +92,7 @@ const UpdateCourse = () => {
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label>Course Code:</label>
-          <input className="form-" name="courseCode" type="text" value={courseDetails.courseCode} onChange={handleChange} required />
+          <input className="form-control" name="courseCode" type="text" value={courseDetails.courseCode} onChange={handleChange} required />
         </div>
         <div className="form-group">
           <label>Course Name:</label>
