@@ -62,7 +62,7 @@ const CourseList = () => {
   };
 
   const handleUpdate = (courseId) => {
-    navigate(/update-course/${courseId}); // Navigate to the update page with the course ID
+    navigate('/update-course/${courseId}'); // Navigate to the update page with the course ID
   };
   
   return (
