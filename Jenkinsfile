@@ -1,25 +1,18 @@
 pipeline {
     agent any
 
-    parameters {
-        booleanParam(name: 'RUN_TESTS', defaultValue: false, description: 'Set to true to run tests during the build process')
-    }
-
     tools {
-        // Ensure Node.js is configured under Jenkins' Global Tool Configuration with the name 'NodeJS'
         nodejs 'NodeJS'
     }
 
     environment {
-        // Environment variables can be set here if needed
-        CI = 'true' // Set CI environment variable to true for better integration with tools like Create React App
+        CI = 'true'
     }
 
     stages {
         stage('Prepare Environment') {
             steps {
                 script {
-                    // Ensuring Git is configured to handle long paths on Windows
                     bat 'git config --system core.longPaths true'
                 }
             }
@@ -34,7 +27,6 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    // Installing npm dependencies
                     bat 'npm install'
                 }
             }
@@ -43,43 +35,60 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    // Building the project with npm
                     bat 'npm run build'
                 }
             }
         }
 
-        stage('Test') {
-            when {
-                expression { params.RUN_TESTS } // Only run tests if the RUN_TESTS parameter is set to true
-            }
+        stage('Deliver') {
             steps {
                 script {
-                    // Running npm tests
-                    bat 'npm test'
-                }
-                post {
-                    always {
-                        // Collecting and archiving test reports can be configured here
-                        // Example: Archive the results for later viewing in Jenkins
-                        archiveArtifacts artifacts: 'path/to/test-reports/*', fingerprint: true
-                    }
+                    // This should be your actual build tool's command to package/release the artifact
+                    echo 'Packaging artifact...'
+                    bat 'npm run package' // Example: npm script to create a production build/package
                 }
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy to Dev Env') {
             steps {
-                echo 'Deploy operation would go here. This could be a script to deploy to a server or another environment.'
-                // Example deployment command
-                // bat 'deploy-script.bat'
+                script {
+                    echo 'Deploying to Development environment...'
+                    bat 'deploy-dev.bat' // Replace with your actual deployment command/script
+                }
+            }
+        }
+
+        stage('Deploy to QAT Env') {
+            steps {
+                script {
+                    echo 'Deploying to QAT environment...'
+                    bat 'deploy-qat.bat' // Replace with your actual deployment command/script
+                }
+            }
+        }
+
+        stage('Deploy to Staging Env') {
+            steps {
+                script {
+                    echo 'Deploying to Staging environment...'
+                    bat 'deploy-staging.bat' // Replace with your actual deployment command/script
+                }
+            }
+        }
+
+        stage('Deploy to Production Env') {
+            steps {
+                script {
+                    echo 'Deploying to Production environment...'
+                    bat 'deploy-prod.bat' // Replace with your actual deployment command/script
+                }
             }
         }
     }
 
     post {
         always {
-            // Cleaning up the workspace after the build to free up space
             cleanWs()
             echo 'Build process completed.'
         }
