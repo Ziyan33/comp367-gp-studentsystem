@@ -8,11 +8,11 @@ pipeline {
 
 
     stages {
-        stage('Prepare Environment') {
+          stage('Prepare Environment') {
             steps {
                 script {
-                    // Configuring Git to support long file paths on Windows
-                    bat "git config --system core.longPaths true"
+                    // Specifying the full path to Git here
+                    bat '"C:\\Program Files\\Git\\bin\\git.exe" config --system core.longPaths true'
                 }
             }
         }
