@@ -5,10 +5,6 @@ pipeline {
         maven 'M3'
     }
 
-    environment {
-        // Define any environment variables here if needed
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -27,8 +23,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    // Try to run tests, but don't fail the build if there are none
-                    powershell "mvn test; if ($?) { echo 'Tests completed.' } else { echo 'No tests to run.' }"
+                    powershell "mvn test; if (\\$?) { echo 'Tests completed.' } else { echo 'No tests to run.' }"
                 }
             }
             post {
