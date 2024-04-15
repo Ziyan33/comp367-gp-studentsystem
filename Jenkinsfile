@@ -5,9 +5,7 @@ pipeline {
         maven 'M3'
     }
 
-    environment {
-        // Define any environment variables if needed
-    }
+
 
     stages {
         stage('Prepare Environment') {
