@@ -1,18 +1,26 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'M3'
+    parameters {
+        booleanParam(name: 'RUN_TESTS', defaultValue: false, description: 'Set to true to run tests during the build process')
     }
 
+    tools {
+        // Ensure Node.js is configured under Jenkins' Global Tool Configuration with the name 'NodeJS'
+        nodejs 'NodeJS'
+    }
 
+    environment {
+        // Environment variables can be set here if needed
+        CI = 'true' // Set CI environment variable to true for better integration with tools like Create React App
+    }
 
     stages {
-          stage('Prepare Environment') {
+        stage('Prepare Environment') {
             steps {
                 script {
-                    // Specifying the full path to Git here
-                    bat '"C:\\Program Files\\Git\\bin\\git.exe" config --system core.longPaths true'
+                    // Ensuring Git is configured to handle long paths on Windows
+                    bat 'git config --system core.longPaths true'
                 }
             }
         }
@@ -23,25 +31,38 @@ pipeline {
             }
         }
 
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    // Installing npm dependencies
+                    bat 'npm install'
+                }
+            }
+        }
+
         stage('Build') {
             steps {
                 script {
-                    // Running Maven build
-                    bat "mvn clean install"
+                    // Building the project with npm
+                    bat 'npm run build'
                 }
             }
         }
 
         stage('Test') {
+            when {
+                expression { params.RUN_TESTS } // Only run tests if the RUN_TESTS parameter is set to true
+            }
             steps {
                 script {
-                    // Running tests with Maven
-                    bat "mvn test"
+                    // Running npm tests
+                    bat 'npm test'
                 }
                 post {
                     always {
-                        // Archiving test results, if they exist
-                        junit '**/target/surefire-reports/TEST-*.xml'
+                        // Collecting and archiving test reports can be configured here
+                        // Example: Archive the results for later viewing in Jenkins
+                        archiveArtifacts artifacts: 'path/to/test-reports/*', fingerprint: true
                     }
                 }
             }
@@ -49,24 +70,24 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                script {
-                    // Deployment script or additional steps could be added here
-                    echo 'Deploying build'
-                }
+                echo 'Deploy operation would go here. This could be a script to deploy to a server or another environment.'
+                // Example deployment command
+                // bat 'deploy-script.bat'
             }
         }
     }
 
     post {
         always {
-            echo 'Cleaning up workspace'
-            cleanWs() // Cleans the workspace after the pipeline run is complete
+            // Cleaning up the workspace after the build to free up space
+            cleanWs()
+            echo 'Build process completed.'
         }
         success {
-            echo 'Build and test stages completed successfully.'
+            echo 'Build completed successfully.'
         }
         failure {
-            echo 'An error occurred during the build process.'
+            echo 'Build failed. Check logs for details.'
         }
     }
 }
